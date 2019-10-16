@@ -7,7 +7,8 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "devmenu": "adb shell input keyevent 82"
   },
   "dependencies": {
     "@babel/plugin-transform-typescript": "^7.6.3",
@@ -18,12 +19,14 @@
     "@types/react-test-renderer": "^16.9.1",
     "react": "16.9.0",
     "react-native": "0.61.2",
+    "styled-components": "^4.4.0",
     "typescript": "^3.6.4"
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",
     "@babel/runtime": "^7.6.3",
     "@react-native-community/eslint-config": "^0.0.5",
+    "@types/styled-components": "^4.1.19",
     "babel-jest": "^24.9.0",
     "eslint": "^6.5.1",
     "jest": "^24.9.0",

@@ -8,111 +8,113 @@
  * @format
  */
 
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   SafeAreaView,
-  StyleSheet,
   ScrollView,
-  View,
-  Text,
   StatusBar,
+  Animated,
+  Text,
+  View,
+  TouchableWithoutFeedback,
 } from 'react-native';
 
-import {
-  Header,
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import styled from 'styled-components/native';
+
+var ACTION_TIMER = 1000;
+var COLORS = ['rgb(111,235,00)', 'rgb(111,235,62)'];
+
+const useBackgroundAnimation = () => {
+  const [state, setState] = useState({
+    pressAction: new Animated.Value(0),
+    value: 0,
+    completed: false,
+  });
+  useEffect(() => {
+    pressAction.addListener(v => setState({...state, value: v.value}));
+  }, []);
+  const {pressAction, value, completed} = state;
+  const handlePressIn = () => {
+    if (!completed) {
+      Animated.timing(pressAction, {
+        duration: ACTION_TIMER,
+        toValue: 1,
+      }).start(() => {
+        setState({...state, completed: true});
+      });
+    }
+  };
+  const handlePressOut = () => {
+    if (!completed) {
+      Animated.timing(pressAction, {
+        duration: value * ACTION_TIMER,
+        toValue: 0,
+      }).start();
+    }
+  };
+  const getProgressStyle = () => {
+    var bgColor = pressAction.interpolate({
+      inputRange: [0, 1],
+      outputRange: COLORS,
+    });
+    var width = pressAction.interpolate({
+      inputRange: [0, 1],
+      outputRange: ['0%', '100%'],
+    });
+    return {
+      backgroundColor: bgColor,
+      width: width,
+    };
+  };
+  return {
+    ...state,
+    getProgressStyle,
+    handlePressIn,
+    handlePressOut,
+  };
+};
+const Button = styled<typeof View>(Animated.createAnimatedComponent(View))`
+  flex-direction: row;
+  flex: 1;
+  flex-basis: 10%;
+  flex-grow: 0;
+  background-color: red;
+  border: 3px;
+`;
 
 const App = () => {
-  const usingHermes =
-    typeof HermesInternal === 'object' && HermesInternal !== null;
+  const {
+    handlePressIn,
+    handlePressOut,
+    getProgressStyle,
+  } = useBackgroundAnimation();
   return (
     <>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
-          <Header />
-          {!usingHermes ? null : (
-            <View style={styles.engine}>
-              <Text style={styles.footer}>Engine: Hermes</Text>
-            </View>
-          )}
-          <View style={styles.body}>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Step TEW</Text>
-              <Text style={styles.sectionDescription}>
-                Edit <Text style={styles.highlight}>App.tsx</Text> to change
-                this screen and then come back to see your edits.
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>See Your Changes</Text>
-              <Text style={styles.sectionDescription}>
-                <ReloadInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Debug</Text>
-              <Text style={styles.sectionDescription}>
-                <DebugInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Learn More</Text>
-              <Text style={styles.sectionDescription}>
-                Read the docs to discover what to do next:
-              </Text>
-            </View>
-            <LearnMoreLinks />
-          </View>
-        </ScrollView>
-      </SafeAreaView>
+      <View
+        style={{
+          flex: 1,
+        }}>
+        <TouchableWithoutFeedback
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}>
+          <Button>
+            <Animated.View
+              style={[
+                {
+                  flex: 1,
+                  position: 'absolute',
+                  top: 0,
+                  bottom: 0,
+                },
+                getProgressStyle() as any,
+              ]}
+            />
+            <Text> Coucou</Text>
+          </Button>
+        </TouchableWithoutFeedback>
+      </View>
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: Colors.lighter,
-  },
-  engine: {
-    position: 'absolute',
-    right: 0,
-  },
-  body: {
-    backgroundColor: Colors.white,
-  },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-  footer: {
-    color: Colors.dark,
-    fontSize: 12,
-    fontWeight: '600',
-    padding: 4,
-    paddingRight: 12,
-    textAlign: 'right',
-  },
-});
 
 export default App;
