@@ -8,20 +8,12 @@
  * @format
  */
 
-import React, {useState, useEffect} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  Animated,
-  Text,
-  View,
-  TouchableWithoutFeedback,
-} from 'react-native';
+import React, {CSSProperties} from 'react';
+import {View} from 'react-native';
 
-import styled from 'styled-components/native';
+import {useSpring, animated} from 'react-spring';
 
-var ACTION_TIMER = 1000;
+/* var ACTION_TIMER = 1000;
 var COLORS = ['rgb(111,235,00)', 'rgb(111,235,62)'];
 
 const useBackgroundAnimation = () => {
@@ -35,22 +27,18 @@ const useBackgroundAnimation = () => {
   }, []);
   const {pressAction, value, completed} = state;
   const handlePressIn = () => {
-    if (!completed) {
-      Animated.timing(pressAction, {
-        duration: ACTION_TIMER,
-        toValue: 1,
-      }).start(() => {
-        setState({...state, completed: true});
-      });
-    }
+    Animated.timing(pressAction, {
+      duration: ACTION_TIMER,
+      toValue: !completed ? 1 : 0,
+    }).start(() => {
+      setState({...state, completed: true});
+    });
   };
   const handlePressOut = () => {
-    if (!completed) {
-      Animated.timing(pressAction, {
-        duration: value * ACTION_TIMER,
-        toValue: 0,
-      }).start();
-    }
+    Animated.timing(pressAction, {
+      duration: value * ACTION_TIMER,
+      toValue: !completed ? 0 : 1,
+    }).start();
   };
   const getProgressStyle = () => {
     var bgColor = pressAction.interpolate({
@@ -82,39 +70,50 @@ const Button = styled<typeof View>(Animated.createAnimatedComponent(View))`
   border: 3px;
 `;
 
-const App = () => {
+const LongPressButton = () => {
   const {
     handlePressIn,
     handlePressOut,
     getProgressStyle,
   } = useBackgroundAnimation();
   return (
-    <>
-      <View
-        style={{
-          flex: 1,
-        }}>
-        <TouchableWithoutFeedback
-          onPressIn={handlePressIn}
-          onPressOut={handlePressOut}>
-          <Button>
-            <Animated.View
-              style={[
-                {
-                  flex: 1,
-                  position: 'absolute',
-                  top: 0,
-                  bottom: 0,
-                },
-                getProgressStyle() as any,
-              ]}
-            />
-            <Text> Coucou</Text>
-          </Button>
-        </TouchableWithoutFeedback>
-      </View>
-    </>
+    <TouchableWithoutFeedback
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}>
+      <Button>
+        <Animated.View
+          style={[
+            {
+              flex: 1,
+              position: 'absolute',
+              top: 0,
+              bottom: 0,
+            },
+            getProgressStyle() as any,
+          ]}
+        />
+        <Text> Coucou</Text>
+      </Button>
+    </TouchableWithoutFeedback>
   );
+}; */
+const Temp = animated(View);
+
+const Test = () => {
+  const props = useSpring({
+    to: async (next: (props: CSSProperties) => Promise<void>) => {
+      while (1) {
+        await next({flex: 0});
+        await next({flex: 1});
+      }
+    },
+    from: {flex: 1},
+    config: {duration: 5000},
+  });
+  return <Temp style={[{backgroundColor: 'red'}, props as any]}></Temp>;
+};
+const App = () => {
+  return <Test></Test>;
 };
 
 export default App;
